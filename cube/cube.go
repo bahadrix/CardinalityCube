@@ -14,7 +14,7 @@ type Cube struct {
 
 type Snapshot map[string]*BoardSnapshot
 
-func CreateCube(coreGenerator cores.CoreInitiator, coreOpts interface{}) *Cube {
+func NewCube(coreGenerator cores.CoreInitiator, coreOpts interface{}) *Cube {
 	return &Cube{
 		boardMap: map[string]*Board{},
 		coreGenerator: coreGenerator,
@@ -55,7 +55,7 @@ func (c *Cube) generateCell() *Cell {
 }
 
 func d() {
-	cube := CreateCube(cores.HLL, nil)
+	cube := NewCube(cores.HLL, nil)
 	board := cube.GetBoard("s", true)
 	cell := board.GetCell("e", "d", true)
 	_ = cell

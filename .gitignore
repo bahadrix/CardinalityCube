@@ -19,3 +19,6 @@
 # Project must be IDE agnostic
 .idea
 .vscode
+
+# IPC Sockets
+.sock
