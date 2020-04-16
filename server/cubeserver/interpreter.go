@@ -7,7 +7,7 @@ import (
 // Interpreter interprets given string command and executes it on the server.
 // Interpreter are not thread safe intentionally, so each routine must own an interpreter.
 type Interpreter struct {
-	commands map[string]Command
+	commands map[string]*Command
 }
 
 
@@ -37,5 +37,5 @@ func (interpreter *Interpreter) Interpret(server *Server, input string) (string,
 		args = []string{}
 	}
 
-	return command(server, args...)
+	return command.Executor(server, args...)
 }

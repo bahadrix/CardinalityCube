@@ -1,6 +1,6 @@
 package main
 
-import "github.com/bahadrix/cardinalitycube/server/cli/cmd"
+import "github.com/bahadrix/cardinalitycube/server/service/cmd"
 
 func main() {
 	cmd.Execute()
