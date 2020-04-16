@@ -1,10 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/bahadrix/cardinalitycube/cubeclient/client"
-	"github.com/manifoldco/promptui"
+	prompt "github.com/c-bata/go-prompt"
 	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"os"
@@ -15,6 +16,7 @@ var serverAddress string
 var commandToExecute string
 var cubeClient *client.Client
 
+var suggestions []prompt.Suggest
 
 func executeCommand(commandString string) (reply string, err error) {
 	parts := strings.Fields(commandString)
@@ -36,21 +38,70 @@ func init() {
 	flag.StringVarP(&commandToExecute, "exec", "e", "", "Execute command, get output and exit. If not entered, interactive client will be started.")
 }
 
-func startCli() {
+func autoComplete(in prompt.Document) []prompt.Suggest {
 
-	prompt := promptui.Prompt{
-		Label:     fmt.Sprintf("%s> ", serverAddress),
+	w := in.GetWordBeforeCursor()
+	if w == "" {
+		return []prompt.Suggest{}
+	}
+	if len(strings.Fields(in.Text)) >= 2  {
+		return []prompt.Suggest{}
+	}
+	return prompt.FilterHasPrefix(suggestions, w, true)
+}
 
+func loadSuggestions() {
+	var lexicon map[string]map[string]string
+
+	lexiconJson, err := executeCommand("LEXICON")
+
+	if err != nil {
+		fmt.Printf("Unable to receive lexicon %s\n", err.Error())
 	}
 
-	for {
-		cmd, err := prompt.Run()
+	err = json.Unmarshal([]byte(lexiconJson), &lexicon)
+	if err != nil {
+		fmt.Printf("Unable to parse lexicon %s\n", err.Error())
+	}
 
-		if err != nil {
-			log.Errorf("Prompt failed: %s", err.Error())
+	cmdCount := len(lexicon)
+	suggestions = make([]prompt.Suggest, cmdCount)
+
+	i := -1
+	for cmd, info := range lexicon {
+		i++
+		suggestions[i] = prompt.Suggest{
+			Text:        cmd,
+			Description: info["short"],
 		}
+	}
+
+	suggestions = append(suggestions, prompt.Suggest{
+		Text:        "EXIT",
+		Description: "Terminate console session",
+	})
 
 
+}
+
+func startCli() {
+
+	loadSuggestions()
+
+	for {
+
+		cmd := prompt.Input(fmt.Sprintf("%s> ", serverAddress), autoComplete,
+			prompt.OptionTitle("Cardinality Cube Server"),
+			prompt.OptionPrefixTextColor(prompt.DarkBlue),
+			prompt.OptionPreviewSuggestionTextColor(prompt.Blue),
+			prompt.OptionSelectedSuggestionBGColor(prompt.LightGray),
+			prompt.OptionSelectedSuggestionTextColor(prompt.DarkGray),
+			prompt.OptionDescriptionTextColor(prompt.DarkGray),
+			prompt.OptionSuggestionBGColor(prompt.DarkGray))
+
+		if strings.ToLower(cmd) == "exit" {
+			break
+		}
 		reply, err := executeCommand(cmd)
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err.Error())
@@ -80,9 +131,12 @@ func main() {
 		reply, err := executeCommand(commandToExecute)
 		exitCode := 0
 		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
+			_, _ = fmt.Fprintf(os.Stderr, "Fail: %s\n", err.Error())
 			exitCode = 1
 		} else {
+			if reply == "" {
+				reply = "OK"
+			}
 			_, _ = fmt.Fprintf(os.Stdout, "%s\n", reply)
 			exitCode = 0
 		}

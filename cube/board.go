@@ -53,12 +53,46 @@ func (b *Board) GetCell(rowName string, cellName string, createIfNotExists bool)
 	return cell
 }
 
-func (b* Board) GetSnapshot() *BoardSnapshot {
+func (b *Board) GetRowSnapshot(rowName string) *RowSnapshot {
+	b.rowLock.RLock()
+	row, _ := b.rowMap[rowName]
+	b.rowLock.RUnlock()
+
+	if row == nil {
+		return nil
+	}
+	return row.GetSnapshot()
+}
+
+func (b *Board) GetSnapshot() *BoardSnapshot {
 	ss := make(BoardSnapshot)
 	b.rowLock.RLock()
 	for key, row := range b.rowMap {
 		ss[key] = row.GetSnapshot()
 	}
 	b.rowLock.RUnlock()
+
 	return &ss
+}
+
+func (b *Board) CheckRowExists(rowName string) bool {
+	b.rowLock.RLock()
+	_, exists := b.rowMap[rowName]
+	b.rowLock.RUnlock()
+	return exists
+}
+
+func (b *Board) Drop() {
+	b.rowLock.Lock()
+	b.rowMap = make(map[string]*Row)
+	b.rowLock.Unlock()
+}
+
+func (b *Board) DropRow(rowName string) {
+	b.rowLock.Lock()
+	_, rowExists := b.rowMap[rowName]
+	if rowExists {
+		delete(b.rowMap, rowName)
+	}
+	b.rowLock.Unlock()
 }
