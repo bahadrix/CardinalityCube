@@ -12,7 +12,7 @@ import (
 
 func TestCubeThreadSafety(t *testing.T) {
 
-	setCube := CreateCube(cores.BasicSet, nil)
+	setCube := NewCube(cores.BasicSet, nil)
 
 	numBoards := 8
 	numRows := 100

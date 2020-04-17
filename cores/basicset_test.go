@@ -1,12 +1,11 @@
 package cores
 
 import (
-	"github.com/bmizerany/assert"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestBasicSetCore_Push(t *testing.T) {
-
 	setCore := BasicSet(nil)
 
 	setCore.Push([]byte("test1"))
