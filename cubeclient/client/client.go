@@ -8,7 +8,7 @@ import (
 )
 
 type Client struct {
-	dealer *goczmq.Sock
+	dealer   *goczmq.Sock
 	endpoint string
 }
 
@@ -55,14 +55,12 @@ func (c *Client) Execute(command string, args ...string) (reply string, err erro
 		reply = string(responseBytes[1:])
 	}
 
-
 	if state != cubeserver.MsgPrefixSuccess {
 		err = errors.New(reply)
 		reply = ""
 	}
 
 	return
-
 
 }
 

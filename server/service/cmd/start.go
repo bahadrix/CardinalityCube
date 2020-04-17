@@ -63,5 +63,4 @@ func init() {
 	startCmd.Flags().IntP("workers", "w", 12, "Number of parallel command processors")
 	startCmd.Flags().StringP("core", "c", "hll", "Core type of cube. Currently hll and basicset supported")
 
-
 }

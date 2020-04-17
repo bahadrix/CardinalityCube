@@ -1,11 +1,12 @@
 package client
 
 import (
+	"encoding/json"
 	"github.com/bahadrix/cardinalitycube/cores"
 	"github.com/bahadrix/cardinalitycube/cube"
 	"github.com/bahadrix/cardinalitycube/server/cubeserver"
-	"github.com/bmizerany/assert"
 	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
@@ -18,7 +19,7 @@ const (
 )
 
 func TestMain(m *testing.M) {
-	testServer = cubeserver.NewServer(cube.NewCube(cores.HLL, nil), TestSocket, 10, 10, 4)
+	testServer = cubeserver.NewServer(cube.NewCube(cores.BasicSet, nil), TestSocket, 10, 10, 4)
 
 	go func() {
 		err := testServer.Start()
@@ -31,28 +32,103 @@ func TestMain(m *testing.M) {
 	r := m.Run()
 
 	testServer.Shutdown()
-	time.Sleep(2 * time.Second) // grace period
-	os.Exit(r)
+
+	defer os.Exit(r)
 }
 
-
-func TestClient_Close(t *testing.T) {
+func TestClient_Commands(t *testing.T) {
 
 	cli, err := NewClient(TestSocket)
-
 	if err != nil {
 		log.Fatalf("Can't create client: %s", err.Error())
 	}
+	defer cli.Close()
 
-	log.Info("Executing ping command")
-	reply, err := cli.Execute("PING")
-
-	if err != nil {
-		log.Fatalf("Error on getting reply from server %s", err.Error())
+	tests := []struct {
+		Command          string
+		ExpectedResponse string
+	}{
+		{
+			Command:          "PING test",
+			ExpectedResponse: "PONG test",
+		},
+		{
+			Command:          "PUSH board_1 row_1 cell_1 value_1",
+			ExpectedResponse: "",
+		},
+		{
+			Command:          "PUSH board_1 row_1 cell_1 value_1",
+			ExpectedResponse: "",
+		},
+		{
+			Command:          "PUSH board_1 row_1 cell_1 value_2",
+			ExpectedResponse: "",
+		},
+		{
+			Command:          "GET board_1 row_1 cell_1",
+			ExpectedResponse: "2",
+		},
+		{
+			Command:          "EXISTS board_1 row_1 cell_1",
+			ExpectedResponse: "1",
+		},
+		{
+			Command:          "EXISTS board_non_exist row_1 cell_1",
+			ExpectedResponse: "0",
+		},
+		{
+			Command:          "SNAPSHOT board_1 row_1",
+			ExpectedResponse: "cell_1\t2\n",
+		},
+		{
+			Command:          "SNAPSHOT board_1",
+			ExpectedResponse: "row_1\tcell_1\t2\n",
+		},
+		{
+			Command:          "DROP board_1 row_1",
+			ExpectedResponse: "",
+		},
+		{
+			Command:          "EXISTS board_1 row_1",
+			ExpectedResponse: "0",
+		},
+		{
+			Command:          "DROP board_1",
+			ExpectedResponse: "",
+		},
+		{
+			Command:          "EXISTS board_1",
+			ExpectedResponse: "0",
+		},
 	}
 
-	assert.Equal(t, "PONG", reply)
+	for _, test := range tests {
+		t.Run(test.Command, func(t *testing.T) {
+			cmd, args := cubeserver.ParseCommandInput(test.Command)
+			reply, err := cli.Execute(cmd, args...)
 
+			if err != nil {
+				t.Error(err)
+			}
+			assert.Equal(t, test.ExpectedResponse, reply)
+		})
+	}
 
-	cli.Close()
+}
+
+func TestClient_Lexicon(t *testing.T) {
+	cli, err := NewClient(TestSocket)
+	if err != nil {
+		t.Error(err)
+	}
+	defer cli.Close()
+
+	reply, err := cli.Execute("LEXICON")
+
+	var lx interface{}
+	err = json.Unmarshal([]byte(reply), &lx)
+	if err != nil {
+		t.Error(err)
+	}
+
 }

@@ -6,17 +6,17 @@ import (
 )
 
 type Cube struct {
-	boardMap map[string]*Board
+	boardMap      map[string]*Board
 	coreGenerator cores.CoreInitiator
-	coreOpts interface{}
-	boardLock sync.RWMutex
+	coreOpts      interface{}
+	boardLock     sync.RWMutex
 }
 
 type Snapshot map[string]*BoardSnapshot
 
 func NewCube(coreGenerator cores.CoreInitiator, coreOpts interface{}) *Cube {
 	return &Cube{
-		boardMap: map[string]*Board{},
+		boardMap:      map[string]*Board{},
 		coreGenerator: coreGenerator,
 		coreOpts:      coreOpts,
 	}
@@ -49,16 +49,16 @@ func (c *Cube) GetSnapshot() *Snapshot {
 	return &ss
 }
 
-func (c *Cube) generateCell() *Cell {
-	core := c.coreGenerator(c.coreOpts)
-	return &Cell{core:core}
+func (c *Cube) DropBoard(boardName string) {
+	c.boardLock.Lock()
+	_, exists := c.boardMap[boardName]
+	if exists {
+		delete(c.boardMap, boardName)
+	}
+	c.boardLock.Unlock()
 }
 
-func d() {
-	cube := NewCube(cores.HLL, nil)
-	board := cube.GetBoard("s", true)
-	cell := board.GetCell("e", "d", true)
-	_ = cell
-
-
+func (c *Cube) generateCell() *Cell {
+	core := c.coreGenerator(c.coreOpts)
+	return &Cell{core: core}
 }

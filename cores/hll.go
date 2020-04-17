@@ -12,8 +12,7 @@ type HLLCore struct {
 	sketch *hyperloglog.Sketch
 }
 
-// Initialize core
-var HLL CoreInitiator = func(opts interface{}) Core {
+func HLL(opts interface{}) Core {
 	// Get options
 	var coreOpts *HLLOpts
 

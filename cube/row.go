@@ -4,7 +4,7 @@ import "sync"
 
 type Row struct {
 	cellMap map[string]*Cell
-	mux sync.RWMutex
+	mux     sync.RWMutex
 }
 
 type RowSnapshot map[string]uint64

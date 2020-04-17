@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/bahadrix/cardinalitycube/cubeclient/client"
-	prompt "github.com/c-bata/go-prompt"
+	"github.com/bahadrix/cardinalitycube/server/cubeserver"
+	"github.com/c-bata/go-prompt"
 	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"os"
@@ -19,17 +19,8 @@ var cubeClient *client.Client
 var suggestions []prompt.Suggest
 
 func executeCommand(commandString string) (reply string, err error) {
-	parts := strings.Fields(commandString)
-
-	if len(parts) < 1 {
-		err = errors.New("no command given")
-		return
-	}
-
-	if len(parts) > 1 {
-		return cubeClient.Execute(parts[0], parts[1:]...)
-	}
-	return cubeClient.Execute(parts[0])
+	cmd, args := cubeserver.ParseCommandInput(commandString)
+	return cubeClient.Execute(cmd, args...)
 
 }
 
@@ -44,7 +35,7 @@ func autoComplete(in prompt.Document) []prompt.Suggest {
 	if w == "" {
 		return []prompt.Suggest{}
 	}
-	if len(strings.Fields(in.Text)) >= 2  {
+	if len(strings.Fields(in.Text)) >= 2 {
 		return []prompt.Suggest{}
 	}
 	return prompt.FilterHasPrefix(suggestions, w, true)
@@ -80,7 +71,6 @@ func loadSuggestions() {
 		Text:        "EXIT",
 		Description: "Terminate console session",
 	})
-
 
 }
 
@@ -124,8 +114,6 @@ func main() {
 		log.Errorf("Error on connecting client: %s", err.Error())
 		os.Exit(1)
 	}
-
-
 
 	if commandToExecute != "" {
 		reply, err := executeCommand(commandToExecute)

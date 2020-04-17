@@ -3,9 +3,9 @@ package cube
 import "sync"
 
 type Board struct {
-	cube *Cube
-	rowMap map[string]*Row
-	rowLock sync.RWMutex
+	cube     *Cube
+	rowMap   map[string]*Row
+	rowLock  sync.RWMutex
 	cellLock sync.Mutex
 }
 
@@ -13,7 +13,7 @@ type BoardSnapshot map[string]*RowSnapshot
 
 func NewBoard(cube *Cube) *Board {
 	return &Board{
-		cube: cube,
+		cube:   cube,
 		rowMap: make(map[string]*Row),
 	}
 }
@@ -80,12 +80,6 @@ func (b *Board) CheckRowExists(rowName string) bool {
 	_, exists := b.rowMap[rowName]
 	b.rowLock.RUnlock()
 	return exists
-}
-
-func (b *Board) Drop() {
-	b.rowLock.Lock()
-	b.rowMap = make(map[string]*Row)
-	b.rowLock.Unlock()
 }
 
 func (b *Board) DropRow(rowName string) {

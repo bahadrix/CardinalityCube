@@ -11,8 +11,8 @@ const (
 )
 
 const ( // Message State Prefix Bytes
-	MsgPrefixFail     = byte(0)
-	MsgPrefixSuccess  = byte(1)
+	MsgPrefixFail    = byte(0)
+	MsgPrefixSuccess = byte(1)
 )
 
 type Server struct {
@@ -50,9 +50,9 @@ func (s *Server) startRouting() error {
 	go func() {
 		for {
 			request, err := s.router.RecvMessage()
-			if err == goczmq.ErrRecvFrameAfterDestroy {
+			if err == goczmq.ErrRecvFrameAfterDestroy || s.isShuttingDown {
 				break
-			} else if err != nil && !s.isShuttingDown {
+			} else if err != nil {
 				log.Errorf("Error while receiving message from client: %s", err.Error())
 			} else {
 				s.processQueue <- &Message{
@@ -142,4 +142,3 @@ func (s *Server) Start() error {
 func (s *Server) Info() {
 
 }
-

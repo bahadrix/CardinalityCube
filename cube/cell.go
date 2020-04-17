@@ -5,10 +5,9 @@ import (
 	"sync"
 )
 
-
 type Cell struct {
 	core cores.Core
-	mux sync.Mutex
+	mux  sync.Mutex
 }
 
 func (c *Cell) Push(item []byte) {
