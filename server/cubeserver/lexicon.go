@@ -7,24 +7,29 @@ import (
 	"strings"
 )
 
+// Executor function does all the work for command.
 type Executor func(server *Server, args ...string) (string, error)
 
+// Command is a constituent of server language
 type Command struct {
 	ShortDescription string   `json:"short"`
 	Description      string   `json:"description"`
 	Executor         Executor `json:"-"`
 }
 
+// A Lexicon consists of all commands of server
 type Lexicon struct {
 	commands map[string]*Command
 }
 
+// OK is a reply for successful but idempotent operations
 const OK = ""
 
 var lexicon = &Lexicon{
 	commands: make(map[string]*Command),
 }
 
+// Put adds a new command to lexicon
 func (l *Lexicon) Put(name string, cmd *Command) {
 	name = strings.ToUpper(strings.TrimSpace(name))
 
@@ -48,7 +53,8 @@ func (l *Lexicon) CreateInterpreter() *Interpreter {
 	return &Interpreter{commands: commands}
 }
 
-func (l *Lexicon) AsJson() (string, error) {
+// AsJSON Converts whole lexicon to a JSON string
+func (l *Lexicon) AsJSON() (string, error) {
 	buffer := &bytes.Buffer{}
 	encoder := json.NewEncoder(buffer)
 	encoder.SetEscapeHTML(false)

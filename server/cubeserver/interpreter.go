@@ -11,6 +11,7 @@ type Interpreter struct {
 	commands map[string]*Command
 }
 
+// ParseCommandInput parses command returns command and its argument array separately.
 func ParseCommandInput(input string) (command string, args []string) {
 	fields := strings.Fields(input)
 	if len(fields) == 0 {
@@ -27,6 +28,7 @@ func ParseCommandInput(input string) (command string, args []string) {
 	return
 }
 
+// Interpret parses given command and run it on server then returns the result.
 func (interpreter *Interpreter) Interpret(server *Server, input string) (string, error) {
 
 	commandName, args := ParseCommandInput(input)

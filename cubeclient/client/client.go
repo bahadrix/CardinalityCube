@@ -7,11 +7,13 @@ import (
 	"strings"
 )
 
+// A Client connects to existing Cardinality Cube Server and executes command on this server.
 type Client struct {
 	dealer   *goczmq.Sock
 	endpoint string
 }
 
+// NewClient returns a new client
 func NewClient(endpoint string) (*Client, error) {
 	client := &Client{
 		dealer:   nil,
@@ -27,6 +29,7 @@ func (c *Client) acquireDealer() (err error) {
 	return
 }
 
+// Execute executes given command on server and returns the result in synchronized fashion.
 func (c *Client) Execute(command string, args ...string) (reply string, err error) {
 	err = c.acquireDealer()
 	if err != nil {
@@ -64,6 +67,7 @@ func (c *Client) Execute(command string, args ...string) (reply string, err erro
 
 }
 
+// Close closes connection
 func (c *Client) Close() {
 	if c.dealer != nil {
 		c.dealer.Destroy()

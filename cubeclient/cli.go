@@ -44,13 +44,13 @@ func autoComplete(in prompt.Document) []prompt.Suggest {
 func loadSuggestions() {
 	var lexicon map[string]map[string]string
 
-	lexiconJson, err := executeCommand("LEXICON")
+	lexiconJSON, err := executeCommand("LEXICON")
 
 	if err != nil {
 		fmt.Printf("Unable to receive lexicon %s\n", err.Error())
 	}
 
-	err = json.Unmarshal([]byte(lexiconJson), &lexicon)
+	err = json.Unmarshal([]byte(lexiconJSON), &lexicon)
 	if err != nil {
 		fmt.Printf("Unable to parse lexicon %s\n", err.Error())
 	}

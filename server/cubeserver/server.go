@@ -7,14 +7,18 @@ import (
 )
 
 const (
+	// Version for server
 	Version = "0.1.0"
 )
 
 const ( // Message State Prefix Bytes
-	MsgPrefixFail    = byte(0)
+	// MsgPrefixFail for failed operation replies
+	MsgPrefixFail = byte(0)
+	// MsgPrefixSuccess for successful operation replies
 	MsgPrefixSuccess = byte(1)
 )
 
+// Server is Cardinality Cube Server
 type Server struct {
 	processQueue      chan *Message
 	responseQueue     chan *Message
@@ -25,11 +29,13 @@ type Server struct {
 	isShuttingDown    bool
 }
 
+// Message between client and server
 type Message struct {
 	Route   []byte
 	Message []byte
 }
 
+// NewServer creates new server
 func NewServer(cubeToServe *cube.Cube, endPoints string, processQueueSize int, responseQueueSize int, numProcessWorkers int) *Server {
 	return &Server{
 		processQueue:      make(chan *Message, processQueueSize),
@@ -88,6 +94,7 @@ func (s *Server) process() {
 	}
 }
 
+// Shutdown gracefully stops server
 func (s *Server) Shutdown() {
 	log.Info("Shutting down server.")
 	s.isShuttingDown = true
@@ -101,6 +108,7 @@ func (s *Server) Shutdown() {
 	log.Info("Goodbye!")
 }
 
+// Start initiates the server routines and waits for outputs.
 func (s *Server) Start() error {
 
 	log.Infof("Starting router for %s", s.endpoints)
@@ -137,8 +145,4 @@ func (s *Server) Start() error {
 	}
 
 	return nil
-}
-
-func (s *Server) Info() {
-
 }

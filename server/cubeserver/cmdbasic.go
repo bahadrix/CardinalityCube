@@ -48,7 +48,7 @@ func cmdShutdown(server *Server, args ...string) (s string, err error) {
 }
 
 func cmdLexicon(server *Server, args ...string) (s string, err error) {
-	return lexicon.AsJson()
+	return lexicon.AsJSON()
 }
 
 func init() {
