@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/bahadrix/cardinalitycube.svg?branch=master)](https://travis-ci.org/bahadrix/cardinalitycube) [![Go Report Card](https://goreportcard.com/badge/github.com/bahadrix/cardinalitycube)](https://goreportcard.com/report/github.com/bahadrix/cardinalitycube)
+[![Build Status](https://travis-ci.org/bahadrix/cardinalitycube.svg?branch=master)](https://travis-ci.org/bahadrix/cardinalitycube) [![Go Report Card](https://goreportcard.com/badge/github.com/bahadrix/cardinalitycube)](https://goreportcard.com/report/github.com/bahadrix/cardinalitycube) [![Reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/bahadrix/cardinalitycube)
+
 
 # Cardinality Cube 
 Fast and Accurate Approximate Cardinality Estimator Data Structure and Server
