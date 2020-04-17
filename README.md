@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/bahadrix/cardinalitycube.svg?branch=master)](https://travis-ci.org/bahadrix/cardinalitycube)
+
 # Cardinality Cube 
 Fast and Accurate Approximate Cardinality Estimator Data Structure and Server
 
