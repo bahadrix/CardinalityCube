@@ -6,6 +6,7 @@ go:
   - tip
 
 before_install:
+  - sudo apt-get install pkg-config
   - sudo apt-get install -y libczmq4
 
 script:
