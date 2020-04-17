@@ -17,5 +17,10 @@
 # vendor/
 
 # Project must be IDE agnostic
-.idea
-.vscode
+/.idea
+/.vscode
+
+# IPC Sockets
+.sock
+
+/build

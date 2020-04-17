@@ -8,22 +8,20 @@ import (
 	"testing"
 )
 
-
 func TestHLLCore_Initiate(t *testing.T) {
-
-	initializationTests := []struct{
+	initializationTests := []struct {
 		name          string
 		initiatorCore Core
 		targetCore    HLLCore
-	} {
+	}{
 		{
 			name:          "Create HLL Core with 14 Registers",
-			initiatorCore: HLL(&HLLOpts{With16Registers:false}),
+			initiatorCore: HLL(&HLLOpts{With16Registers: false}),
 			targetCore:    HLLCore{sketch: hyperloglog.New14()},
 		},
 		{
 			name:          "Create HLL Core with 16 Registers",
-			initiatorCore: HLL(&HLLOpts{With16Registers:true}),
+			initiatorCore: HLL(&HLLOpts{With16Registers: true}),
 			targetCore:    HLLCore{sketch: hyperloglog.New16()},
 		},
 	}
@@ -70,18 +68,16 @@ func TestHLLCore_Push(t *testing.T) {
 	for _, pt := range pushTests {
 		testName := fmt.Sprintf("Push %d items with %d repetition", pt.totalItem, pt.repetition)
 		t.Run(testName, func(t *testing.T) {
-
 			core := HLL(nil)
 			baseString := "test"
 
 			core.Push([]byte(baseString))
-			var step int = pt.totalItem / pt.repetition
+			var step = pt.totalItem / pt.repetition
 			pt.repetition = pt.totalItem / step // fit for remainder
-
 
 			for i := 1; i < pt.totalItem; i++ {
 				var item []byte
-				if i % step == 0 {
+				if i%step == 0 {
 					item = []byte(baseString)
 				} else {
 					item = []byte(fmt.Sprintf("%s_%d", baseString, i))
@@ -90,10 +86,10 @@ func TestHLLCore_Push(t *testing.T) {
 			}
 
 			realUnique := uint64(pt.totalItem - pt.repetition)
-			uniqueRateActual := float64(core.Count())/float64(pt.totalItem)
-			uniqueRateExpected := float64(realUnique)/float64(pt.totalItem)
+			uniqueRateActual := float64(core.Count()) / float64(pt.totalItem)
+			uniqueRateExpected := float64(realUnique) / float64(pt.totalItem)
 
-			assert.InEpsilonf(t, uniqueRateExpected, uniqueRateActual, pt.epsilon, "Failure rate is too high" )
+			assert.InEpsilonf(t, uniqueRateExpected, uniqueRateActual, pt.epsilon, "Failure rate is too high")
 		})
 	}
 }
