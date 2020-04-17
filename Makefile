@@ -1,6 +1,5 @@
 BIN_DIR := $(GOPATH)/bin
-# VERSION := $(shell git describe --tags)
-VERSION := "0.1.0"
+VERSION := $(shell git describe --tags)
 BUILD := $(shell git rev-parse --short HEAD)
 LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
 
