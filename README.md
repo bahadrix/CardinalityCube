@@ -1,6 +1,6 @@
 ![Logo](https://user-images.githubusercontent.com/609775/79579888-dc8cf680-80d0-11ea-838e-603cebd8c00c.png)
 
-[![Build Status](https://travis-ci.org/bahadrix/cardinalitycube.svg?branch=master)](https://travis-ci.org/bahadrix/cardinalitycube) [![Go Report Card](https://goreportcard.com/badge/github.com/bahadrix/cardinalitycube)](https://goreportcard.com/report/github.com/bahadrix/cardinalitycube) [![Reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/bahadrix/cardinalitycube?tab=subdirectories)
+[![Build Status](https://travis-ci.org/bahadrix/cardinalitycube.svg?branch=master)](https://travis-ci.org/bahadrix/cardinalitycube) [![Go Report Card](https://goreportcard.com/badge/github.com/bahadrix/cardinalitycube)](https://goreportcard.com/report/github.com/bahadrix/cardinalitycube) [![codecov](https://codecov.io/gh/bahadrix/cardinalitycube/branch/master/graph/badge.svg)](https://codecov.io/gh/bahadrix/cardinalitycube) [![Reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/bahadrix/cardinalitycube?tab=subdirectories) 
 
 
 # Cardinality Cube 
