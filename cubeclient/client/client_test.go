@@ -53,6 +53,10 @@ func TestClient_Commands(t *testing.T) {
 			ExpectedResponse: "PONG test",
 		},
 		{
+			Command: "SNAPSHOT none",
+			ExpectedResponse: "",
+		},
+		{
 			Command:          "PUSH board_1 row_1 cell_1 value_1",
 			ExpectedResponse: "",
 		},
