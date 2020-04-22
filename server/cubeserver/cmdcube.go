@@ -53,6 +53,9 @@ func cmdSnapshot(server *Server, args ...string) (s string, err error) {
 
 	if len(args) > 0 {
 		board = server.cube.GetBoard(args[0], false)
+		if board == nil {
+			return "", nil
+		}
 	} else {
 		err = errors.New("at least board parameter required")
 		return
