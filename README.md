@@ -6,6 +6,20 @@
 # Cardinality Cube 
 Fast and Accurate Approximate Cardinality Estimator Data Structure and Server
 
+## Dependencies
+
+Following packages needed by GOCMZQ
+
+- pkg-config
+- libczmq-dev
+- libsodium-dev
+
+You can install them in Debian based system like:
+```bash
+apt-get install -y pkg-config libczmq4 libczmq-dev libsodium-dev
+```
+
+
 # Possible Usages
 Thanks to modular design of CC ecosystem you can either;
 - Use the cube as a data structure in your code *(see readme file under cube folder)*
