@@ -53,8 +53,16 @@ func TestClient_Commands(t *testing.T) {
 			ExpectedResponse: "PONG test",
 		},
 		{
-			Command: "SNAPSHOT none",
+			Command:          "SNAPSHOT none",
 			ExpectedResponse: "",
+		},
+		{
+			Command:          "LIST",
+			ExpectedResponse: "",
+		},
+		{
+			Command:          "LEN",
+			ExpectedResponse: "0",
 		},
 		{
 			Command:          "PUSH board_1 row_1 cell_1 value_1",
@@ -87,6 +95,50 @@ func TestClient_Commands(t *testing.T) {
 		{
 			Command:          "SNAPSHOT board_1",
 			ExpectedResponse: "row_1\tcell_1\t2\n",
+		},
+		{
+			Command:          "LIST",
+			ExpectedResponse: "board_1",
+		},
+		{
+			Command:          "LIST board_1",
+			ExpectedResponse: "row_1",
+		},
+		{
+			Command:          "LEN board_1",
+			ExpectedResponse: "1",
+		},
+		{
+			Command:          "LIST board_1 row_1",
+			ExpectedResponse: "cell_1",
+		},
+		{
+			Command:          "LEN board_1 row_1",
+			ExpectedResponse: "1",
+		},
+		{
+			Command:          "PUSH board_1 row_2 cell_1 value_1",
+			ExpectedResponse: "",
+		},
+		{
+			Command:          "LIST board_1",
+			ExpectedResponse: "row_1\nrow_2",
+		},
+		{
+			Command:          "LEN board_1",
+			ExpectedResponse: "2",
+		},
+		{
+			Command:          "PUSH board_1 row_2 cell_2 value_1",
+			ExpectedResponse: "",
+		},
+		{
+			Command:          "LIST board_1 row_2",
+			ExpectedResponse: "cell_1\ncell_2",
+		},
+		{
+			Command:          "LEN board_1 row_2",
+			ExpectedResponse: "2",
 		},
 		{
 			Command:          "DROP board_1 row_1",

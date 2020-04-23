@@ -44,3 +44,19 @@ func (r *Row) GetSnapshot() *RowSnapshot {
 	r.mux.RUnlock()
 	return &ss
 }
+
+// GetCellKeys returns keys of cells. Read blocking operation.
+func (r *Row) GetCellKeys() []string {
+	r.mux.RLock()
+	keys := make([]string, 0, len(r.cellMap))
+	for key := range r.cellMap {
+		keys = append(keys, key)
+	}
+	r.mux.RUnlock()
+	return keys
+}
+
+// GetCellCount returns cell count of row.
+func (r *Row) GetCellCount() int {
+	return len(r.cellMap)
+}

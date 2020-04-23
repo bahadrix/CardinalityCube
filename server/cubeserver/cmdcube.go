@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/bahadrix/cardinalitycube/cube"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 func cmdPush(server *Server, args ...string) (s string, err error) {
@@ -140,6 +142,54 @@ func cmdExists(server *Server, args ...string) (s string, err error) {
 	return "1", nil
 }
 
+func cmdList(server *Server, args ...string) (s string, err error) {
+	argsLen := len(args)
+	var keys []string
+
+	if argsLen == 0 { // Get board keys of cube
+		keys = server.cube.GetBoardKeys()
+	} else {
+		board := server.cube.GetBoard(args[0], false)
+		if board == nil {
+			return
+		}
+
+		if argsLen == 1 { // Get row keys of board
+			keys = board.GetRowKeys()
+		} else if argsLen == 2 { // Get cell keys of row
+			keys = board.GetCellKeys(args[1])
+		} else {
+			return "", errors.New("command takes max 3 arguments")
+		}
+	}
+
+	sort.Strings(keys)
+	return strings.Join(keys, "\n"), nil
+}
+
+func cmdLen(server *Server, args ...string) (s string, err error) {
+	argsLen := len(args)
+	c := 0
+
+	if argsLen == 0 {
+		c = server.cube.GetBoardCount()
+	} else {
+		board := server.cube.GetBoard(args[0], false)
+		if board == nil {
+			return
+		}
+		if argsLen == 1 { // Get row keys of board
+			c = board.GetRowCount()
+		} else if argsLen == 2 { // Get cell keys of row
+			c = board.GetCellCount(args[1])
+		} else {
+			return "", errors.New("command takes max 3 arguments")
+		}
+	}
+
+	return strconv.Itoa(c), nil
+}
+
 func init() {
 	lexicon.Put("PUSH", &Command{
 		ShortDescription: "Push given item value to cube.",
@@ -169,5 +219,17 @@ func init() {
 		ShortDescription: "Check the existence of board, row or cell",
 		Description:      "Usage: EXISTS <board> [row [cell]]",
 		Executor:         cmdExists,
+	})
+
+	lexicon.Put("LIST", &Command{
+		ShortDescription: "Get list of board, row or cell names",
+		Description:      "Usage: LIST [board [row]]",
+		Executor:         cmdList,
+	})
+
+	lexicon.Put("LEN", &Command{
+		ShortDescription: "Get key count for board, row or cells",
+		Description:      "Usage: LEN [board [row]]",
+		Executor:         cmdLen,
 	})
 }
