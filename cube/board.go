@@ -102,3 +102,43 @@ func (b *Board) DropRow(rowName string) {
 	}
 	b.rowLock.Unlock()
 }
+
+// GetRowKeys returns row names. Read blocking operation.
+func (b *Board) GetRowKeys() []string {
+	b.rowLock.RLock()
+	keys := make([]string, 0, len(b.rowMap))
+	for key := range b.rowMap {
+		keys = append(keys, key)
+	}
+	b.rowLock.RUnlock()
+
+	return keys
+
+}
+
+// GetRowCount returns roe count.
+func (b *Board) GetRowCount() int {
+	return len(b.rowMap)
+}
+
+// GetCellKeys returns cell keys of row. Read blocking operation.
+func (b *Board) GetCellKeys(rowName string) (keys []string) {
+	b.rowLock.RLock()
+	r, rowExists := b.rowMap[rowName]
+	b.rowLock.RUnlock()
+	if !rowExists {
+		return
+	}
+	return r.GetCellKeys()
+}
+
+// GetCellCount returns cell count of row. Read blocking operation.
+func (b *Board) GetCellCount(rowName string) int {
+	b.rowLock.RLock()
+	r, rowExists := b.rowMap[rowName]
+	b.rowLock.RUnlock()
+	if !rowExists {
+		return 0
+	}
+	return r.GetCellCount()
+}

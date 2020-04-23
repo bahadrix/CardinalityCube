@@ -71,3 +71,19 @@ func (c *Cube) generateCell() *Cell {
 	core := c.coreGenerator(c.coreOpts)
 	return &Cell{core: core}
 }
+
+// GetBoardKeys returns board names. Read blocking operation
+func (c *Cube) GetBoardKeys() []string {
+	c.boardLock.RLock()
+	keys := make([]string, 0, len(c.boardMap))
+	for key := range c.boardMap {
+		keys = append(keys, key)
+	}
+	c.boardLock.RUnlock()
+	return keys
+}
+
+// GetBoardCount returns current board count in cube.
+func (c *Cube) GetBoardCount() int {
+	return len(c.boardMap)
+}
