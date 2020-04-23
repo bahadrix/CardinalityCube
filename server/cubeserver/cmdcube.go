@@ -151,7 +151,7 @@ func cmdList(server *Server, args ...string) (s string, err error) {
 	} else {
 		board := server.cube.GetBoard(args[0], false)
 		if board == nil {
-			return "", nil
+			return
 		}
 
 		if argsLen == 1 { // Get row keys of board
@@ -165,6 +165,29 @@ func cmdList(server *Server, args ...string) (s string, err error) {
 
 	sort.Strings(keys)
 	return strings.Join(keys, "\n"), nil
+}
+
+func cmdLen(server *Server, args ...string) (s string, err error) {
+	argsLen := len(args)
+	c := 0
+
+	if argsLen == 0 {
+		c = server.cube.GetBoardCount()
+	} else {
+		board := server.cube.GetBoard(args[0], false)
+		if board == nil {
+			return
+		}
+		if argsLen == 1 { // Get row keys of board
+			c = board.GetRowCount()
+		} else if argsLen == 2 { // Get cell keys of row
+			c = board.GetCellCount(args[1])
+		} else {
+			return "", errors.New("command takes max 3 arguments")
+		}
+	}
+
+	return strconv.Itoa(c), nil
 }
 
 func init() {
@@ -202,5 +225,11 @@ func init() {
 		ShortDescription: "Get list of board, row or cell names",
 		Description:      "Usage: LIST [board [row]]",
 		Executor:         cmdList,
+	})
+
+	lexicon.Put("LEN", &Command{
+		ShortDescription: "Get key count for board, row or cells",
+		Description:      "Usage: LEN [board [row]]",
+		Executor:         cmdLen,
 	})
 }
