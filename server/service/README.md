@@ -1,5 +1,20 @@
-Command Line Interface Tool for Cardinality Cube Server
+# Command Line Interface Tool for Cardinality Cube Server
 
+## Dependencies
+
+Following packages needed by GOCMZQ
+
+- pkg-config
+- libczmq-dev
+- libsodium-dev
+
+You can install them in Debian based system like:
+```bash
+apt-get install -y pkg-config libczmq4 libczmq-dev libsodium-dev
+```
+
+
+## Tool Usage
 ```
 Usage:
   server [command]
