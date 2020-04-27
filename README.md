@@ -11,6 +11,6 @@ Fast and Accurate Approximate Cardinality Estimator Data Structure and Server
 Thanks to modular design of CC ecosystem you can either;
 - Use the cube as a data structure in your code *(see [Cube](cube))*
 - Embed the server in your code *(see [usage](server/service/cmd/start.go) in service module)*
-- Use the full blown server as standalone *(see [Server CLI](server/service))*
+- Use the full blown server as standalone *(see [Service CLI](server/service))*
 
 these options also available for client usage:
