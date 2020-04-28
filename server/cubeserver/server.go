@@ -2,6 +2,8 @@ package cubeserver
 
 import (
 	"github.com/bahadrix/cardinalitycube/cube"
+	"github.com/bahadrix/cardinalitycube/cube/pb"
+	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 	"github.com/zeromq/goczmq"
 )
@@ -145,4 +147,30 @@ func (s *Server) Start() error {
 	}
 
 	return nil
+}
+
+// Dump returns server data serialized to bytes
+func (s *Server) Dump() ([]byte, error) {
+
+	dataObj, err := s.cube.Dump()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return proto.Marshal(dataObj)
+}
+
+// Load loads serialized data into server. Existing data will be replaced.
+func (s *Server) Load(data []byte) error {
+
+	var readObj pb.CubeData
+
+	err := proto.Unmarshal(data, &readObj)
+
+	if err != nil {
+		return err
+	}
+
+	return s.cube.LoadData(&readObj)
 }
