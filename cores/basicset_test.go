@@ -6,7 +6,11 @@ import (
 )
 
 func TestBasicSetCore_Push(t *testing.T) {
-	setCore := BasicSet(nil)
+	setCore, err := BasicSet(nil, nil)
+
+	if err != nil {
+		t.Error(err)
+	}
 
 	setCore.Push([]byte("test1"))
 	setCore.Push([]byte("test1"))

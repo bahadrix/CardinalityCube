@@ -1,0 +1,18 @@
+syntax = "proto3";
+option go_package = ".;pb";
+
+message CellData {
+    bytes coreData = 1;
+}
+
+message RowData {
+    map<string, CellData> cellMap = 1;
+}
+
+message BoardData {
+    map<string, RowData> rowMap = 1;
+}
+
+message CubeData {
+    map<string, BoardData> boardMap = 1;
+}
