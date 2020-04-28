@@ -1,6 +1,9 @@
 package cube
 
-import "sync"
+import (
+	"github.com/bahadrix/cardinalitycube/cube/pb"
+	"sync"
+)
 
 // Row is a build block of board. It holds Cells.
 type Row struct {
@@ -59,4 +62,22 @@ func (r *Row) GetCellKeys() []string {
 // GetCellCount returns cell count of row.
 func (r *Row) GetCellCount() int {
 	return len(r.cellMap)
+}
+
+func (r *Row) Dump() (*pb.RowData, error) {
+	r.mux.RLock()
+	defer r.mux.RUnlock()
+
+	dataMap := make(map[string]*pb.CellData, len(r.cellMap))
+	var err error
+	for k, c := range r.cellMap {
+		dataMap[k], err = c.Dump()
+
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	return &pb.RowData{CellMap:dataMap}, err
 }

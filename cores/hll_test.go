@@ -2,13 +2,17 @@ package cores
 
 import (
 	"fmt"
-	"github.com/axiomhq/hyperloglog"
+	"github.com/bahadrix/hyperloglog"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 )
 
 func TestHLLCore_Initiate(t *testing.T) {
+
+	core14, _ := HLL(&HLLOpts{With16Registers: false}, nil)
+	core16, _ := HLL(&HLLOpts{With16Registers: true}, nil)
+
 	initializationTests := []struct {
 		name          string
 		initiatorCore Core
@@ -16,12 +20,12 @@ func TestHLLCore_Initiate(t *testing.T) {
 	}{
 		{
 			name:          "Create HLL Core with 14 Registers",
-			initiatorCore: HLL(&HLLOpts{With16Registers: false}),
+			initiatorCore: core14,
 			targetCore:    HLLCore{sketch: hyperloglog.New14()},
 		},
 		{
 			name:          "Create HLL Core with 16 Registers",
-			initiatorCore: HLL(&HLLOpts{With16Registers: true}),
+			initiatorCore: core16,
 			targetCore:    HLLCore{sketch: hyperloglog.New16()},
 		},
 	}
@@ -68,7 +72,7 @@ func TestHLLCore_Push(t *testing.T) {
 	for _, pt := range pushTests {
 		testName := fmt.Sprintf("Push %d items with %d repetition", pt.totalItem, pt.repetition)
 		t.Run(testName, func(t *testing.T) {
-			core := HLL(nil)
+			core, _ := HLL(nil, nil)
 			baseString := "test"
 
 			core.Push([]byte(baseString))

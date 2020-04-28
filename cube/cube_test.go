@@ -3,7 +3,10 @@ package cube
 import (
 	"fmt"
 	"github.com/bahadrix/cardinalitycube/cores"
+	"github.com/bahadrix/cardinalitycube/cube/pb"
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"reflect"
 
 	"sync"
 
@@ -111,5 +114,93 @@ func TestCubeThreadSafety(t *testing.T) {
 
 		wg.Wait()
 	})
+
+}
+
+func TestCube_Serialization(t *testing.T) {
+
+
+	subjects := []struct {
+		name string
+		cube *Cube
+	}{
+		{
+			name: "Basic set cube",
+			cube: NewCube(cores.BasicSet, nil),
+		},
+		{
+			name: "HLL Cube",
+			cube: NewCube(cores.HLL, nil),
+		},
+	}
+
+	ops := []func(c *Cube){
+		func(c *Cube) {
+			// do nothing
+		},
+		func(c *Cube) {
+			c.GetBoard("b1", true).GetCell("r1", "c1", true).Push([]byte("test"))
+		},
+		func(c *Cube) {
+			c.GetBoard("b2", true).GetCell("r1", "c1", true).Push([]byte("test"))
+			c.GetBoard("b2", true).GetCell("r1", "c1", true).Push([]byte("test"))
+		},
+		func(c *Cube) {
+			c.GetBoard("b3", true).GetCell("r1", "c1", true).Push([]byte("test"))
+			c.GetBoard("b3", true).GetCell("r1", "c2", true).Push([]byte("test"))
+		},
+	}
+
+	for _, subject := range subjects {
+		for i, op := range ops {
+			t.Run(fmt.Sprintf("Test_%d_for_%s", i, subject.name), func(t *testing.T) {
+
+				op(subject.cube)
+
+				dataObj, err := subject.cube.Dump()
+
+				if err != nil {
+					t.Error(err)
+				}
+
+				data, err := proto.Marshal(dataObj)
+
+				if err != nil {
+					t.Error(err)
+				}
+
+				var readObj pb.CubeData
+
+				err = proto.Unmarshal(data, &readObj)
+
+				if err != nil {
+					t.Error(err)
+				}
+
+				kube := NewCube(subject.cube.coreGenerator, subject.cube.coreOpts)
+				err = kube.LoadData(&readObj)
+
+				if err != nil {
+					t.Error(err)
+				}
+
+				// Compare
+				origSnap := subject.cube.GetSnapshot()
+				loadSnap := kube.GetSnapshot()
+				if !reflect.DeepEqual(origSnap, loadSnap) {
+					t.Error("Snapshots not equal")
+				}
+
+				// Add after test
+
+				kube.GetBoard("bX", true).GetCell("r1", "c1", true).Push([]byte("test"))
+				subject.cube.GetBoard("bX", true).GetCell("r1", "c1", true).Push([]byte("test"))
+
+				if !reflect.DeepEqual(subject.cube.GetSnapshot(), kube.GetSnapshot()) {
+					t.Error("Add after Snapshots not equal")
+				}
+			})
+		}
+	}
 
 }

@@ -3,6 +3,7 @@ package cores
 import (
 	"crypto/sha1" //nolint:gosec
 	"encoding/base64"
+	"encoding/json"
 )
 
 // BasicSetCore is a very basic core that counts exact distinct items.
@@ -11,11 +12,23 @@ type BasicSetCore struct {
 	set map[string]bool
 }
 
+
 // BasicSet is a CoreInitiator
-func BasicSet(opts interface{}) Core {
-	return BasicSetCore{
-		set: make(map[string]bool),
+func BasicSet(opts interface{}, serializedBytes []byte) (Core, error) {
+	var set map[string]bool
+
+	if serializedBytes != nil {
+		err := json.Unmarshal(serializedBytes, &set)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		set = make(map[string]bool)
 	}
+
+	return BasicSetCore{
+		set: set,
+	}, nil
 }
 
 // Push pushes item into set
@@ -27,4 +40,8 @@ func (b BasicSetCore) Push(item []byte) {
 // Count returns item count in the set
 func (b BasicSetCore) Count() uint64 {
 	return uint64(len(b.set))
+}
+
+func (b BasicSetCore) Serialize() ([]byte, error) {
+	return json.Marshal(b.set)
 }

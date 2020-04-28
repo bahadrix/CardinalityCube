@@ -2,6 +2,7 @@ package cube
 
 import (
 	"github.com/bahadrix/cardinalitycube/cores"
+	"github.com/bahadrix/cardinalitycube/cube/pb"
 	"sync"
 )
 
@@ -67,9 +68,18 @@ func (c *Cube) DropBoard(boardName string) {
 	c.boardLock.Unlock()
 }
 
+
 func (c *Cube) generateCell() *Cell {
-	core := c.coreGenerator(c.coreOpts)
+	core, _ := c.coreGenerator(c.coreOpts, nil)
 	return &Cell{core: core}
+}
+
+func (c *Cube) deserializeCell(coreBytes []byte) (*Cell, error) {
+	core, err := c.coreGenerator(nil, coreBytes)
+	if err != nil {
+		return nil, err
+	}
+	return &Cell{core:core}, nil
 }
 
 // GetBoardKeys returns board names. Read blocking operation
@@ -86,4 +96,47 @@ func (c *Cube) GetBoardKeys() []string {
 // GetBoardCount returns current board count in cube.
 func (c *Cube) GetBoardCount() int {
 	return len(c.boardMap)
+}
+
+func (c *Cube) Dump() (*pb.CubeData, error) {
+
+	c.boardLock.RLock()
+	defer c.boardLock.RUnlock()
+
+	dataMap := make(map[string]*pb.BoardData, len(c.boardMap))
+	var err error
+	for k, b := range c.boardMap{
+		dataMap[k], err = b.Dump()
+
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	return &pb.CubeData{ BoardMap:dataMap}, err
+
+}
+
+func (c *Cube) LoadData(data *pb.CubeData) error {
+
+	c.boardLock.Lock()
+	defer c.boardLock.Unlock()
+
+	for boardName, boardData := range data.BoardMap {
+
+		board, boardExists := c.boardMap[boardName]
+		if !boardExists {
+			board = NewBoard(c)
+			c.boardMap[boardName] = board
+		}
+
+		err := board.LoadData(boardData)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

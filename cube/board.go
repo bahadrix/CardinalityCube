@@ -1,6 +1,9 @@
 package cube
 
-import "sync"
+import (
+	"github.com/bahadrix/cardinalitycube/cube/pb"
+	"sync"
+)
 
 // Board is a table like data structure which consists of rows.
 // It is of course thread safe.
@@ -142,3 +145,51 @@ func (b *Board) GetCellCount(rowName string) int {
 	}
 	return r.GetCellCount()
 }
+
+
+func (b *Board) Dump() (*pb.BoardData, error) {
+	b.rowLock.RLock()
+	defer b.rowLock.RUnlock()
+
+	dataMap := make(map[string]*pb.RowData, len(b.rowMap))
+	var err error
+	for k, r := range b.rowMap {
+		dataMap[k], err = r.Dump()
+
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	return &pb.BoardData{RowMap:dataMap}, err
+}
+
+func (b *Board) LoadData(data *pb.BoardData) error {
+
+	b.rowLock.Lock()
+	defer b.rowLock.Unlock()
+
+	for rowName, rowData := range data.RowMap {
+
+		row, rowExists := b.rowMap[rowName]
+
+		if !rowExists {
+			row = NewRow()
+			b.rowMap[rowName] = row
+		}
+
+		for cellName, cellData := range rowData.CellMap {
+			cell, err := b.cube.deserializeCell(cellData.CoreData)
+			if err != nil {
+				return err
+			}
+			row.SetCell(cellName, cell)
+		}
+	}
+
+	return nil
+
+}
+
+
