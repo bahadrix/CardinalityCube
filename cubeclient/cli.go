@@ -76,6 +76,8 @@ func loadSuggestions() {
 
 func startCli() {
 
+	initialHistoryCapacity := 10
+	history := make([]string, 0, initialHistoryCapacity)
 	loadSuggestions()
 
 	for {
@@ -87,11 +89,14 @@ func startCli() {
 			prompt.OptionSelectedSuggestionBGColor(prompt.LightGray),
 			prompt.OptionSelectedSuggestionTextColor(prompt.DarkGray),
 			prompt.OptionDescriptionTextColor(prompt.DarkGray),
-			prompt.OptionSuggestionBGColor(prompt.DarkGray))
+			prompt.OptionSuggestionBGColor(prompt.DarkGray),
+			prompt.OptionHistory(history))
 
 		if strings.ToLower(cmd) == "exit" {
 			break
 		}
+
+		history = append(history, cmd)
 		reply, err := executeCommand(cmd)
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err.Error())
